@@ -1,0 +1,139 @@
+program_timezone: Europe/Warsaw
+
+# Full schedule from "Certificate Program in Agentic AI – April 2026 Cohort"
+# release_date: the Thursday content becomes available
+# skip: true   → no downloadable notebook (project weeks, shared-date weeks)
+# break: true  → no content released
+
+weeks:
+  - week: 1
+    release_date: 2026-04-09
+    break: false
+    module: "Prompt Engineering Foundations"
+    topic: "Python Refresher for Agentic AI"
+    expected_resources:
+      - type: notebook
+        title_hints: ["python refresher", "python", "notebook"]
+
+  - week: 2
+    release_date: 2026-04-16
+    break: false
+    module: "Prompt Engineering Foundations"
+    topic: "Introduction to Large Language Models"
+    expected_resources:
+      - type: notebook
+        title_hints: ["large language models", "llm", "huggingface", "notebook"]
+
+  - week: 3
+    release_date: 2026-04-23
+    break: false
+    module: "Prompt Engineering Foundations"
+    topic: "Prompt Engineering Techniques & RAG"
+    expected_resources:
+      - type: notebook
+        title_hints: ["prompt engineering", "rag", "retrieval", "notebook"]
+
+  # Project-1 shares release date with week 3 — no new notebook
+  - week: 4
+    release_date: 2026-04-23
+    skip: true
+    module: "Prompt Engineering Foundations"
+    topic: "Project-1"
+
+  # Learning Break
+  - week: 5
+    release_date: 2026-05-07
+    break: true
+    break_name: "Learning Break"
+
+  - week: 6
+    release_date: 2026-05-14
+    break: false
+    module: "Introduction to Agentic AI Design"
+    topic: "Introduction to Agentic AI"
+    expected_resources:
+      - type: notebook
+        title_hints: ["agentic ai", "introduction", "notebook"]
+
+  - week: 7
+    release_date: 2026-05-28
+    break: false
+    module: "Introduction to Agentic AI Design"
+    topic: "Core Agent Concepts"
+    expected_resources:
+      - type: notebook
+        title_hints: ["agent concepts", "core agent", "notebook"]
+
+  - week: 8
+    release_date: 2026-06-04
+    break: false
+    module: "Introduction to Agentic AI Design"
+    topic: "Ethics, Safety, Alignment & Responsible AI"
+    expected_resources:
+      - type: notebook
+        title_hints: ["ethics", "safety", "alignment", "responsible", "notebook"]
+
+  - week: 9
+    release_date: 2026-06-11
+    break: false
+    module: "Designing and Building Agentic Systems"
+    topic: "Planning & Reasoning Mechanisms"
+    expected_resources:
+      - type: notebook
+        title_hints: ["planning", "reasoning", "notebook"]
+
+  # Project-2 shares release date with week 9 — no new notebook
+  - week: 10
+    release_date: 2026-06-11
+    skip: true
+    module: "Designing and Building Agentic Systems"
+    topic: "Project-2"
+
+  # US Independence Day Break
+  - week: 11
+    release_date: 2026-07-02
+    break: true
+    break_name: "US Independence Day Break"
+
+  - week: 12
+    release_date: 2026-07-02
+    break: false
+    module: "Designing and Building Agentic Systems"
+    topic: "Multi-Agent Systems (MAS)"
+    expected_resources:
+      - type: notebook
+        title_hints: ["multi-agent", "mas", "notebook"]
+
+  - week: 13
+    release_date: 2026-07-16
+    break: false
+    module: "Advanced Agentic AI"
+    topic: "Reinforcement Learning in Agents"
+    expected_resources:
+      - type: notebook
+        title_hints: ["reinforcement learning", "rl", "notebook"]
+
+  - week: 14
+    release_date: 2026-07-23
+    break: false
+    module: "Advanced Agentic AI"
+    topic: "Interaction & Embodiment"
+    expected_resources:
+      - type: notebook
+        title_hints: ["interaction", "embodiment", "notebook"]
+
+  # Project-3 shares release date with week 14 — no new notebook
+  - week: 15
+    release_date: 2026-07-23
+    skip: true
+    module: "Advanced Agentic AI"
+    topic: "Project-3"
+
+  - week: 16
+    release_date: 2026-08-13
+    break: false
+    module: "Advanced Agentic AI"
+    topic: "Pre-Deployment and Operationalization of Agentic Systems"
+    expected_resources:
+      - type: notebook
+        title_hints: ["deployment", "operationalization", "notebook"]

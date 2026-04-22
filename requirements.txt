@@ -1,0 +1,7 @@
+playwright
+jupytext
+nbformat
+nbconvert
+pyyaml
+python-dotenv
+tzdata

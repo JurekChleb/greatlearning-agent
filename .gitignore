@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.pyc
+
+# secrets / session
+.env
+data/auth/
+
+# downloaded raw notebooks
+data/downloads/
+
+# generated outputs — local only
+data/scripts/
+data/summaries/
+data/logs/
+
+# user processing state
+data/state/processed.json
+
+# internal planning docs
+greatlearning-agent-handoff.md
+
+# stray notebooks at project root
+*.ipynb
+
+# keep directory skeletons
+!**/.gitkeep
