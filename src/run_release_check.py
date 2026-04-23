@@ -130,7 +130,10 @@ def run() -> int:
                 page = ctx.new_page()
                 logger.info(f"Opening {COURSE_URL}")
                 page.goto(COURSE_URL, wait_until="domcontentloaded", timeout=30_000)
-                page.wait_for_load_state("networkidle", timeout=20_000)
+                try:
+                    page.wait_for_load_state("networkidle", timeout=20_000)
+                except Exception:
+                    pass  # SPA may never fully idle; find_notebook waits for real content
 
                 # Check session still valid
                 if LOGIN_URL_FRAGMENT in page.url:

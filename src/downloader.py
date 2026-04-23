@@ -40,7 +40,11 @@ def _dump_debug(page: Page, label: str) -> None:
 def _find_download_url(page: Page) -> str:
     """Extract the signed 'Download Notebook' URL from the nbviewer iframe."""
     # Wait for the nbviewer iframe to appear
-    page.wait_for_selector("iframe", timeout=NAV_TIMEOUT)
+    try:
+        page.wait_for_selector("iframe", timeout=NAV_TIMEOUT)
+    except Exception:
+        _dump_debug(page, "no_iframe")
+        raise
 
     nbviewer_frame = next(
         (f for f in page.frames if "nbviewer" in f.url),

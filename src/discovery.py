@@ -50,6 +50,22 @@ def find_notebook(page: Page, week_number: int, title_hints: list[str]) -> str |
     """
     logger.info(f"Discovering notebook for week {week_number}, hints={title_hints}")
 
+    # Wait until the full module list is rendered. The spinner page has ~1 font_subtitleDesktop
+    # span; a fully loaded course page has 20+. Threshold of 8 safely clears the spinner.
+    try:
+        page.wait_for_function(
+            "() => document.querySelectorAll('span.font_subtitleDesktop').length >= 8",
+            timeout=45_000,
+        )
+    except Exception:
+        count = page.evaluate("() => document.querySelectorAll('span.font_subtitleDesktop').length")
+        logger.warning(f"Timed out waiting for course content (only {count} section spans present)")
+        _dump_candidates(page, week_number, [])
+        return None
+
+    count = page.evaluate("() => document.querySelectorAll('span.font_subtitleDesktop').length")
+    logger.info(f"Course page loaded ({count} section spans)")
+
     # Collect all module section headings and their contained item links.
     # Structure on the page:
     #   <span class="font_subtitleDesktop ...">Week N : ... - MLS</span>   ← section header
@@ -78,23 +94,50 @@ def find_notebook(page: Page, week_number: int, title_hints: list[str]) -> str |
         _dump_candidates(page, week_number, [])
         return None
 
-    # Collect all item links on the page with their titles
-    item_links = page.locator("a.is_Anchor span.font_bodyDesktop").all()
-    candidates: list[tuple[int, str, str]] = []  # (score, title, href)
+    # Scroll the MLS section into view to trigger lazy-loaded items, then wait briefly
+    try:
+        section_spans[mls_section_idx].scroll_into_view_if_needed(timeout=5000)
+        page.wait_for_timeout(2000)
+    except Exception:
+        pass
 
-    for span in item_links:
-        try:
-            title = span.inner_text(timeout=2000).strip()
-        except Exception:
-            continue
-        if not week_pattern.search(title):
-            continue
-        # Get the href from the parent <a>
-        try:
-            href = span.locator("xpath=ancestor::a[1]").get_attribute("href", timeout=2000)
-        except Exception:
-            continue
-        if not href:
+    # Collect item links that belong to this MLS section using DOM order:
+    # items must appear after the MLS heading and before the next section heading.
+    # Week N items may not carry "Week N" in their title (e.g. "Notebook : Prompt Engineering"),
+    # so title-based week filtering is unreliable — DOM position is the right scope.
+    raw_items: list[dict] = page.evaluate(f"""() => {{
+        const FOLLOWING = 4;  // Node.DOCUMENT_POSITION_FOLLOWING
+        const PRECEDING  = 2;  // Node.DOCUMENT_POSITION_PRECEDING
+        const spans = Array.from(document.querySelectorAll('span.font_subtitleDesktop'));
+        const mlsIdx = {mls_section_idx};
+        const mlsSpan = spans[mlsIdx];
+        // Skip sub-section labels ("Slides", "Notebooks", "Dataset" etc.) and
+        // use only the next top-level heading as the boundary.
+        const topLevel = /week\\s*\\d|learning|mandatory|recordings|groups|notes/i;
+        let nextTopSpan = null;
+        for (let i = mlsIdx + 1; i < spans.length; i++) {{
+            if (topLevel.test(spans[i].textContent)) {{
+                nextTopSpan = spans[i];
+                break;
+            }}
+        }}
+        return Array.from(document.querySelectorAll('a[href*="/modules/items/"]'))
+            .filter(a => {{
+                const afterMls   = mlsSpan.compareDocumentPosition(a) & FOLLOWING;
+                const beforeNext = !nextTopSpan || (nextTopSpan.compareDocumentPosition(a) & PRECEDING);
+                return afterMls && beforeNext;
+            }})
+            .map(a => ({{
+                href: a.getAttribute('href'),
+                text: a.textContent.trim().replace(/\\s+/g, ' ')
+            }}));
+    }}""")
+
+    candidates: list[tuple[int, str, str]] = []  # (score, title, href)
+    for item in raw_items:
+        href  = item.get("href", "")
+        title = item.get("text", "").strip()
+        if not href or not title:
             continue
         score = _score(title, title_hints)
         candidates.append((score, title, href))
@@ -102,6 +145,7 @@ def find_notebook(page: Page, week_number: int, title_hints: list[str]) -> str |
 
     if not candidates:
         logger.warning(f"No item candidates found for week {week_number}")
+        _dump_candidates(page, week_number, [])
         return None
 
     candidates.sort(key=lambda x: x[0], reverse=True)
